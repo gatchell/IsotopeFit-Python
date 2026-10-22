@@ -33,6 +33,8 @@ from scipy.linalg import solve_triangular
 from scipy.optimize import nnls
 from scipy.sparse.csgraph import connected_components
 
+from .fitting import REDUCED_SIZE
+from .spectrum import increasing_from
 from .model import Calibration, Molecule, Project
 from .pattern import adapt_peak_shape
 
@@ -59,7 +61,19 @@ def global_design_matrix(massaxis: np.ndarray, molecules: Sequence[Molecule],
     shape = calibration.shape
     fitmask = np.zeros(n, dtype=bool)
     rows, cols, vals = [], [], []
-    increasing = massaxis.size < 2 or bool(np.all(np.diff(massaxis) > 0))
+    # Binary search where the axis increases (all of it, after a few bins before
+    # time zero in files from TOFWERK data); a scan over the few bins before that.
+    k = increasing_from(massaxis)
+    if k > n // 2:
+        k = n
+    head, tail = massaxis[:k], massaxis[k:]
+
+    def between(a, b):  # indices with a < mass < b
+        idx = k + np.arange(np.searchsorted(tail, a, side="right"),
+                            np.searchsorted(tail, b, side="left"))
+        if k:
+            idx = np.concatenate([np.flatnonzero((a < head) & (head < b)), idx])
+        return idx
     for j, mol in enumerate(molecules):
         pd = np.asarray(mol.peakdata, dtype=float).reshape(-1, 2)
         if pd.shape[0]:
@@ -69,14 +83,8 @@ def global_design_matrix(massaxis: np.ndarray, molecules: Sequence[Molecule],
             peak = adapt_peak_shape(shape, fwhm, 1.0)
             lo, hi = peak.breaks[0] + mass, peak.breaks[-1] + mass
             half = searchrange * FWHM_RANGE * fwhm
-            if increasing:
-                ind = np.arange(np.searchsorted(massaxis, lo, side="right"),
-                                np.searchsorted(massaxis, hi, side="left"))
-                fitmask[np.searchsorted(massaxis, mass - half, side="right"):
-                        np.searchsorted(massaxis, mass + half, side="left")] = True
-            else:
-                ind = np.flatnonzero((lo < massaxis) & (massaxis < hi))
-                fitmask[(mass - half < massaxis) & (massaxis < mass + half)] = True
+            ind = between(lo, hi)
+            fitmask[between(mass - half, mass + half)] = True
             if ind.size:
                 rows.append(ind)
                 cols.append(np.full(ind.size, j))
@@ -104,6 +112,29 @@ def _block_errors(M: np.ndarray, residuals: np.ndarray) -> np.ndarray:
         C = S @ S.T
         B = M.T @ (M * (residuals ** 2)[:, None])
         return np.sqrt(np.abs(np.einsum("ij,jk,ki->i", C, B, C)))
+
+
+def _reduced_block(M: sp.csc_matrix, y: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Areas and sandwich errors of a large block through the m × m normal matrix.
+
+    Same results as the dense route (see ``fitting._reduced_nnls``), but for a
+    block with ~1500 molecules in seconds instead of minutes.
+    """
+    from .fitting import _reduced_nnls
+
+    n, m = M.shape
+    x, _ = _reduced_nnls(M, y, with_errors=False)
+    if n < m:
+        return x, np.full(m, np.nan)
+    G = (M.T @ M).toarray()
+    w, V = np.linalg.eigh(G)
+    if np.any(w <= max(float(w.max()), 0.0) * 1e-14):
+        return x, np.full(m, np.inf)  # singular, as in the dense route
+    C = (V / w) @ V.T  # inv(M'M)
+    r = y - M @ x
+    B = (M.T @ M.multiply((r ** 2)[:, None]).tocsc()).toarray()
+    with np.errstate(all="ignore"):
+        return x, np.sqrt(np.abs(np.einsum("ij,jk,ki->i", C, B, C)))
 
 
 def fit_global(peakdata: np.ndarray, molecules: Sequence[Molecule], calibration: Calibration,
@@ -135,10 +166,14 @@ def fit_global(peakdata: np.ndarray, molecules: Sequence[Molecule], calibration:
         if rows.size == 0:  # molecule with no fitted points: MATLAB gives area 0, error Inf/NaN
             done += cols.size
             continue
-        A = sub[rows].toarray()
-        x, _ = nnls(A, y[rows], maxiter=50 * max(cols.size, 1))
-        areas[cols] = x
-        errors[cols] = _block_errors(A, y[rows] - A @ x)
+        if rows.size * cols.size > REDUCED_SIZE:  # large block: reduced form
+            x, err = _reduced_block(sub[rows].tocsc(), y[rows])
+            areas[cols], errors[cols] = x, err
+        else:
+            A = sub[rows].toarray()
+            x, _ = nnls(A, y[rows], maxiter=50 * max(cols.size, 1))
+            areas[cols] = x
+            errors[cols] = _block_errors(A, y[rows] - A @ x)
         done += cols.size
         if progress:
             progress(nmol + done, 2 * nmol)

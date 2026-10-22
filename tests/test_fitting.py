@@ -213,3 +213,25 @@ def test_errors_are_one_standard_deviation(method):
     scatter = np.std(areas, axis=0, ddof=1)
     reported = np.mean(errors, axis=0)
     np.testing.assert_allclose(reported, scatter, rtol=0.12)
+
+
+def test_reduced_solution_equals_direct(monkeypatch):
+    """Large fits use the m × m normal-equation form; it gives the same areas and errors."""
+    import isotopefit.fitting as fitting
+
+    project = load_ifd(refdata("testfile.ifd"))
+    ticks = []
+    direct = fit_project(copy.deepcopy(project), Settings(), mode="ranges",
+                         progress=lambda i, n: ticks.append((i, n)))
+    # progress counts molecules, so it ends at the number of molecules fitted
+    assert ticks[-1][0] == ticks[-1][1] == sum(1 for m in direct)
+    monkeypatch.setattr(fitting, "REDUCED_SIZE", 0)  # every fit in reduced form
+    reduced = fit_project(copy.deepcopy(project), Settings(), mode="ranges")
+    a = np.array([m.area for m in direct])
+    b = np.array([m.area for m in reduced])
+    big = a > 1e-6 * a.max()
+    np.testing.assert_allclose(b[big], a[big], rtol=1e-6)
+    ea = np.array([m.areaerror for m in direct])
+    eb = np.array([m.areaerror for m in reduced])
+    ok = np.isfinite(ea) & (ea > 0) & big
+    np.testing.assert_allclose(eb[ok], ea[ok], rtol=1e-6)

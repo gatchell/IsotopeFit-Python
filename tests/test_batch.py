@@ -78,3 +78,16 @@ def test_batch_fit_folder(tmp_path):
     np.testing.assert_allclose([m.area for m in fitted.molecules], r.areas, rtol=1e-12)
     np.testing.assert_allclose([m.areaerror for m in fitted.molecules], r.errors, rtol=1e-12)
     assert fitted.gui_status["fitted"]
+
+
+def test_reduced_blocks_equal_direct(monkeypatch):
+    import isotopefit.batch as batch
+
+    p = load_ifd(refdata("testfile.ifd"))
+    direct = fit_global(p.peakdata, p.molecules, p.calibration)
+    monkeypatch.setattr(batch, "REDUCED_SIZE", 0)  # every block in reduced form
+    reduced = batch.fit_global(p.peakdata, p.molecules, p.calibration)
+    big = direct.areas > 1e-6 * direct.areas.max()
+    np.testing.assert_allclose(reduced.areas[big], direct.areas[big], rtol=1e-6)
+    ok = np.isfinite(direct.errors) & (direct.errors > 0) & big
+    np.testing.assert_allclose(reduced.errors[ok], direct.errors[ok], rtol=1e-6)

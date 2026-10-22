@@ -78,6 +78,26 @@ class _CloseFilter(QObject):
         return False
 
 
+class _CurveStep:
+    """Progress of a fit followed by computing the fitted curve.
+
+    The fit reports (done, total); the bar keeps a last 5 % for the curve, so
+    it only reaches the end (and closes) when everything is finished.
+    """
+
+    def __init__(self, progress):
+        self.progress = progress
+        self.total = 1
+
+    def __call__(self, done: int, total: int) -> None:
+        self.total = max(int(total), 1)
+        self.progress(done, self.total + max(1, self.total // 20))
+
+    def finish(self) -> None:
+        end = self.total + max(1, self.total // 20)
+        self.progress(end, end)
+
+
 def _line_pixmap(pen) -> QPixmap:
     """A short line in the pen's colour and style, as a legend entry."""
     pix = QPixmap(24, 12)
@@ -787,8 +807,11 @@ class MainWindow:
         work = copy.deepcopy(self.project)
         if scope == "all":
             def job(progress):
-                fit_project(work, settings, mode=mode, progress=progress)
-                return work.molecules, self.full_fit_curve(work)
+                step = _CurveStep(progress)
+                fit_project(work, settings, mode=mode, progress=step)
+                curve = self.full_fit_curve(work)
+                step.finish()
+                return work.molecules, curve
         else:
             if scope == "selected":
                 idx = self.selected_indices()
@@ -804,8 +827,11 @@ class MainWindow:
                     return
 
             def job(progress):
-                fit_molecule_subset(work, idx, settings, mode=mode, progress=progress)
-                return work.molecules, self.full_fit_curve(work)
+                step = _CurveStep(progress)
+                fit_molecule_subset(work, idx, settings, mode=mode, progress=step)
+                curve = self.full_fit_curve(work)
+                step.finish()
+                return work.molecules, curve
 
         def done(out) -> None:
             # The fit curve is computed in the background too; here only show it.
@@ -832,8 +858,11 @@ class MainWindow:
         searchrange = self.settings.searchrange
 
         def job(progress):
-            result = fit_project_global(work, searchrange, progress)
-            return work.molecules, result, self.full_fit_curve(work)
+            step = _CurveStep(progress)
+            result = fit_project_global(work, searchrange, step)
+            curve = self.full_fit_curve(work)
+            step.finish()
+            return work.molecules, result, curve
 
         def done(out) -> None:
             molecules, result, curve = out
