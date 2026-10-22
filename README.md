@@ -237,7 +237,8 @@ tests/            checks against reference data from the earlier C# port
 
 ## Reference tests
 
-The tests look for reference files in `../IsotopeFitSharp/IsotopeFitLib.Tests/TestData` and
+The tests look for reference files in `tests/data` (which holds `testfile.ifd`, so most tests
+run anywhere, including on GitHub), then in `../IsotopeFitSharp/IsotopeFitLib.Tests/TestData` and
 `../IsotopeFitPySharp/IfdTestFiles` (override with `ISOTOPEFIT_TESTDATA`). They were
 exported from MATLAB/Octave for the earlier C# port. Missing files mean skipped tests.
 
@@ -337,6 +338,12 @@ MATLAB errors are now corrected, so results differ from MATLAB where they apply:
 
 Kept as in MATLAB: the calibration fit buttons let the resolution move by ±50 %, although the code
 comment says 0.5 per cent (`deltares = 0.5`); see `CAL_DELTARES` in `calibrate.py`.
+
+## Authors
+
+* Stefan Ralser, Johannes Postler and Martina Harnisch (University of Innsbruck): the original
+  MATLAB IsotopeFit.
+* Michael Gatchell (Stockholm University, gatchell@fysik.su.se): the Python port.
 
 ## License
 

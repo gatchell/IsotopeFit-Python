@@ -19,6 +19,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 SEARCH_DIRS = [
     Path(os.environ["ISOTOPEFIT_TESTDATA"]) if "ISOTOPEFIT_TESTDATA" in os.environ else None,
+    ROOT / "tests" / "data",  # files that come with the repository (testfile.ifd, Camphor.icg)
     ROOT.parent / "IsotopeFitSharp" / "IsotopeFitLib.Tests" / "TestData",
     ROOT.parent / "IsotopeFitPySharp" / "IfdTestFiles",
     ROOT.parent / "IsotopeFit_Rewrite" / "PeakShapeFitting",  # peak shape generator exports
