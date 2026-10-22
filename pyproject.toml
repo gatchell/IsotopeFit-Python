@@ -13,6 +13,7 @@ authors = [
     { name = "Stefan Ralser" },
     { name = "Johannes Postler" },
     { name = "Martina Harnisch" },
+    { name = "Michael Gatchell", email = "gatchell@fysik.su.se" },
 ]
 dependencies = [
     "numpy>=1.23",

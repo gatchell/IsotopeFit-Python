@@ -13,7 +13,7 @@ if [[ "$(uname)" != "Darwin" ]]; then
 fi
 
 if [[ -n "${PYTHON:-}" ]]; then
-    PY="$PYTHON"
+    PY="$(command -v "$PYTHON" || echo "$PYTHON")"
 elif [[ -n "${VIRTUAL_ENV:-}" && -x "$VIRTUAL_ENV/bin/python" ]]; then
     PY="$VIRTUAL_ENV/bin/python"
 else
@@ -29,14 +29,12 @@ if [[ -z "$PY" ]]; then
     echo "No Python found. Activate the virtual environment, or run: PYTHON=/path/to/python bash $0" >&2
     exit 1
 fi
-python() { "$PY" "$@"; }
-
-echo "== Python: $PY ($(python --version))"
-python -c "import isotopefit, PySide6, pyqtgraph, h5py" || {
+echo "== Python: $PY ($("$PY" --version))"
+"$PY" -c "import isotopefit, PySide6, pyqtgraph, h5py" || {
     echo 'Install the program first:  pip install -e ".[gui]"' >&2
     exit 1
 }
-python -m pip install --quiet --upgrade "pyinstaller>=6.16" pyinstaller-hooks-contrib
+"$PY" -m pip install --quiet --upgrade "pyinstaller>=6.16" pyinstaller-hooks-contrib
 
 echo "== Icon"
 ICONSET=build/IsotopeFit.iconset
@@ -50,7 +48,7 @@ done
 iconutil -c icns "$ICONSET" -o packaging/IsotopeFit.icns
 
 echo "== App"
-python -m PyInstaller --noconfirm --clean --distpath dist --workpath build/pyinstaller \
+"$PY" -m PyInstaller --noconfirm --clean --distpath dist --workpath build/pyinstaller \
     packaging/IsotopeFit.spec
 
 APP=dist/IsotopeFit.app

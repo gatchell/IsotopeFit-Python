@@ -9,3 +9,6 @@ dist/
 
 # app build
 packaging/IsotopeFit.icns
+
+# logs fetched from GitHub
+build-log.txt

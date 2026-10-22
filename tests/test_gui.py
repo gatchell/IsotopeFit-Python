@@ -422,20 +422,22 @@ def test_plot_controls(app):
 
 
 def test_series_plot_takes_extra_width(app):
-    from PySide6.QtWidgets import QWidget
+    """The plot, not the species column, gets extra width when the window grows.
+
+    Checked through the layout settings: resizing a window is not reliable on
+    headless test machines (it is ignored on GitHub's Windows runners).
+    """
+    from PySide6.QtWidgets import QHBoxLayout, QSizePolicy, QWidget
 
     from isotopefit.gui.main_window import MainWindow
 
     win = MainWindow()
-    win.w.resize(1000, 700)
-    win.w.show()
-    app.processEvents()
+    panel = win.w.findChild(QHBoxLayout, "seriesPanelLayout")
+    assert (panel.stretch(0), panel.stretch(1)) == (0, 1)  # list column fixed, plot column grows
     host = win.w.findChild(QWidget, "seriesPlotHost")
-    narrow = host.width()
-    win.w.resize(1800, 700)
-    app.processEvents()
-    assert host.width() > narrow + 200  # the plot grows, not the space beside it
-    assert win.species_combo.width() <= win.series_list.width() + 1
+    assert host.sizePolicy().horizontalPolicy() == QSizePolicy.Policy.Expanding
+    list_width = win.series_list.maximumWidth()
+    assert win.species_combo.maximumWidth() <= list_width
     win.w.close()
 
 
