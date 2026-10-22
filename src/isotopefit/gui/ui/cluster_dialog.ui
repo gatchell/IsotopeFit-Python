@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ClusterDialog</class>
+ <widget class="QDialog" name="ClusterDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>760</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Cluster generator</string>
+  </property>
+  <layout class="QVBoxLayout" name="dialogLayout">
+   <item>
+    <widget class="QSplitter" name="mainSplitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <widget class="QWidget" name="definitionPanel">
+      <layout class="QVBoxLayout" name="definitionLayout">
+       <item>
+        <widget class="QLabel" name="treeCaption">
+         <property name="text">
+          <string>Cluster definition (each path from a top-level species to a leaf is one family)</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTreeWidget" name="tree">
+         <property name="columnCount">
+          <number>6</number>
+         </property>
+         <column>
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Formula</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>n</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Charge</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Threshold</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Mass accuracy</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item>
+        <layout class="QFormLayout" name="nodeForm">
+         <item row="0" column="0">
+          <widget class="QLabel" name="formulaCaption">
+           <property name="text">
+            <string>Sum formula</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="formulaEdit">
+           <property name="placeholderText">
+            <string>e.g. He, H2O, C60, Al(CH3)3</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="nameCaption">
+           <property name="text">
+            <string>Name (optional)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="nameEdit">
+           <property name="placeholderText">
+            <string>used in molecule names, e.g. TMAl; default: the formula</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="nCaption">
+           <property name="text">
+            <string>n</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="nEdit">
+           <property name="text">
+            <string>1:10</string>
+           </property>
+           <property name="placeholderText">
+            <string>1:10, 0:2:20, [0 1 2], [1,2,4]</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="chargeCaption">
+           <property name="text">
+            <string>Charge</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QSpinBox" name="chargeSpin">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="thresholdCaption">
+           <property name="text">
+            <string>Threshold</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="thresholdEdit">
+           <property name="text">
+            <string>5e-4</string>
+           </property>
+           <property name="toolTip">
+            <string>Isotope peaks below this fraction of the largest are dropped</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="accuracyCaption">
+           <property name="text">
+            <string>Mass accuracy</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="accuracyEdit">
+           <property name="text">
+            <string>1e-3</string>
+           </property>
+           <property name="toolTip">
+            <string>Isotope peaks closer than this (in u) are merged</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="nodeButtons">
+         <item>
+          <widget class="QPushButton" name="addTopButton">
+           <property name="text">
+            <string>Add species</string>
+           </property>
+           <property name="toolTip">
+            <string>Add as a new top-level species (a new family)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="addChildButton">
+           <property name="text">
+            <string>Add to selected</string>
+           </property>
+           <property name="toolTip">
+            <string>Add as a further species of the selected node's family</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="updateButton">
+           <property name="text">
+            <string>Update selected</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="removeButton">
+           <property name="text">
+            <string>Remove selected</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="fileButtons">
+         <item>
+          <widget class="QPushButton" name="openButton">
+           <property name="text">
+            <string>Open definition…</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="saveButton">
+           <property name="text">
+            <string>Save definition…</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="generateButton">
+           <property name="text">
+            <string>Generate</string>
+           </property>
+           <property name="default">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="previewPanel">
+      <layout class="QVBoxLayout" name="previewLayout">
+       <item>
+        <widget class="QLabel" name="resultLabel">
+         <property name="text">
+          <string>Press Generate to make the molecules.</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="resultFilterEdit">
+         <property name="placeholderText">
+          <string>Filter by name</string>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="resultList"/>
+       </item>
+       <item>
+        <widget class="QWidget" name="patternPlotHost">
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>220</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="resultButtons">
+         <item>
+          <widget class="QPushButton" name="saveIfmButton">
+           <property name="text">
+            <string>Save as .ifm…</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="useButton">
+           <property name="text">
+            <string>Use in project</string>
+           </property>
+           <property name="toolTip">
+            <string>Replace the project's molecules with these</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="appendButton">
+           <property name="text">
+            <string>Add to project</string>
+           </property>
+           <property name="toolTip">
+            <string>Add these to the project's molecules (names already there are skipped)</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

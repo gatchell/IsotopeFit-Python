@@ -1,0 +1,844 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1400</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>IsotopeFit</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="centralLayout">
+    <item>
+     <widget class="QSplitter" name="mainSplitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QSplitter" name="plotSplitter">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <widget class="QWidget" name="spectrumPanel">
+        <layout class="QVBoxLayout" name="spectrumPanelLayout" stretch="0,1,0">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="spacing">
+         <number>2</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="spectrumControls">
+          <item>
+           <widget class="QToolButton" name="wholeButton">
+            <property name="text">
+             <string>Whole spectrum</string>
+            </property>
+            <property name="toolTip">
+             <string>Show the whole spectrum (Ctrl+0)</string>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="zoomInButton">
+            <property name="text">
+             <string>Zoom in</string>
+            </property>
+            <property name="toolTip">
+             <string>Show half the mass range, around the centre</string>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="zoomOutButton">
+            <property name="text">
+             <string>Zoom out</string>
+            </property>
+            <property name="toolTip">
+             <string>Show twice the mass range, around the centre</string>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="panLeftButton">
+            <property name="text">
+             <string>◀</string>
+            </property>
+            <property name="toolTip">
+             <string>Move to lower masses by half a view</string>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="panRightButton">
+            <property name="text">
+             <string>▶</string>
+            </property>
+            <property name="toolTip">
+             <string>Move to higher masses by half a view</string>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="fitHeightButton">
+            <property name="text">
+             <string>Fit height</string>
+            </property>
+            <property name="toolTip">
+             <string>Fit the vertical axis to what is visible</string>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="gotoEdit">
+            <property name="placeholderText">
+             <string>Go to: mass, range or molecule</string>
+            </property>
+            <property name="toolTip">
+             <string>Type a mass (300), a range (300-320) or a molecule name ([He]4), then press Enter</string>
+            </property>
+            <property name="clearButtonEnabled">
+             <bool>true</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>230</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="spectrumSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="showCaption">
+            <property name="text">
+             <string>Show:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="showDataCheck">
+            <property name="text">
+             <string>Data</string>
+            </property>
+            <property name="toolTip">
+             <string>Show the measured spectrum</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="showFitCheck">
+            <property name="text">
+             <string>Fit</string>
+            </property>
+            <property name="toolTip">
+             <string>Show the sum of all fitted molecules</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="showPatternCheck">
+            <property name="text">
+             <string>Selected molecule</string>
+            </property>
+            <property name="toolTip">
+             <string>Show the pattern of the molecule selected in the list</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="logButton">
+            <property name="text">
+             <string>Log scale</string>
+            </property>
+            <property name="toolTip">
+             <string>Logarithmic vertical axis</string>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="boxZoomButton">
+            <property name="text">
+             <string>Box zoom</string>
+            </property>
+            <property name="toolTip">
+             <string>On: drag a box to zoom in. Off: drag to move the view</string>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="saveImageButton">
+            <property name="text">
+             <string>Save image…</string>
+            </property>
+            <property name="toolTip">
+             <string>Save the spectrum plot as PNG or SVG</string>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QWidget" name="spectrumPlotHost">
+          <property name="minimumSize">
+           <size>
+            <width>400</width>
+            <height>250</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Scroll to zoom, drag to move (or draw a box with Box zoom on), right-click for more options</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="cursorLabel">
+          <property name="text">
+           <string> </string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+       <widget class="QWidget" name="seriesPanel">
+        <layout class="QHBoxLayout" name="seriesPanelLayout" stretch="0,1">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <layout class="QVBoxLayout" name="seriesListLayout">
+           <item>
+            <widget class="QLabel" name="seriesTitle">
+             <property name="text">
+              <string>&lt;b&gt;Cluster series&lt;/b&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="seriesExplanation">
+             <property name="text">
+              <string>Fitted areas against the number n of one species, e.g. [He]n or [He]n[H2O].</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>260</width>
+               <height>16777215</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="speciesRow">
+             <item>
+              <widget class="QLabel" name="speciesCaption">
+               <property name="text">
+                <string>Species:</string>
+               </property>
+               <property name="buddy">
+                <cstring>speciesCombo</cstring>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="speciesCombo">
+               <property name="editable">
+                <bool>true</bool>
+               </property>
+               <property name="insertPolicy">
+                <enum>QComboBox::NoInsert</enum>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>200</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>The species that is counted. Pick one from the list (found in the molecule names, most common first), or type one and press Enter.</string>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>1</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QLabel" name="seriesListCaption">
+             <property name="text">
+              <string>Series (select one or more):</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QListWidget" name="seriesList">
+             <property name="maximumSize">
+              <size>
+               <width>260</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>Click a series to plot it; Shift- or Cmd-click to plot and export several.</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="seriesPlotLayout" stretch="0,1">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item>
+            <layout class="QHBoxLayout" name="seriesControls">
+          <item>
+           <widget class="QLabel" name="seriesHint">
+            <property name="text">
+             <string>Click a point to show that molecule.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="seriesSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="seriesErrorsCheck">
+            <property name="text">
+             <string>Error bars</string>
+            </property>
+            <property name="toolTip">
+             <string>Show ± one standard deviation</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="seriesLogButton">
+            <property name="text">
+             <string>Log scale</string>
+            </property>
+            <property name="toolTip">
+             <string>Logarithmic vertical axis</string>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="seriesFitButton">
+            <property name="text">
+             <string>Fit view</string>
+            </property>
+            <property name="toolTip">
+             <string>Show the whole series</string>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="seriesExportButton">
+            <property name="text">
+             <string>Export…</string>
+            </property>
+            <property name="toolTip">
+             <string>Export the cluster series as text</string>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QWidget" name="seriesPlotHost">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>1</horstretch>
+               <verstretch>1</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>300</width>
+               <height>150</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="rightPanel">
+       <layout class="QVBoxLayout" name="rightPanelLayout">
+        <item>
+         <widget class="QLabel" name="moleculesLabel">
+          <property name="text">
+           <string>Molecules</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="filterEdit">
+          <property name="placeholderText">
+           <string>Filter by name</string>
+          </property>
+          <property name="clearButtonEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTableView" name="moleculeTable">
+          <property name="minimumSize">
+           <size>
+            <width>320</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::ExtendedSelection</enum>
+          </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="removeButton">
+          <property name="text">
+           <string>Remove selected molecules</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QFormLayout" name="infoLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="comCaption">
+            <property name="text">
+             <string>Centre of mass:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="comLabel">
+            <property name="text">
+             <string>–</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="resolutionCaption">
+            <property name="text">
+             <string>Resolution:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="resolutionLabel">
+            <property name="text">
+             <string>–</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="areaCaption">
+            <property name="text">
+             <string>Area:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="areaLabel">
+            <property name="text">
+             <string>–</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="fitGroup">
+          <property name="title">
+           <string>Fit</string>
+          </property>
+          <layout class="QFormLayout" name="fitForm">
+           <item row="0" column="0">
+            <widget class="QLabel" name="fitScopeCaption">
+             <property name="text">
+              <string>Molecules:</string>
+             </property>
+             <property name="buddy">
+              <cstring>fitScopeCombo</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="fitScopeCombo">
+             <property name="toolTip">
+              <string>Which molecules to fit. Molecules overlapping them are always fitted too.</string>
+             </property>
+             <item>
+              <property name="text">
+               <string>Selected in the list</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>All</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>In the current view</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="fitModeCaption">
+             <property name="text">
+              <string>Method:</string>
+             </property>
+             <property name="buddy">
+              <cstring>fitModeCombo</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="fitModeCombo">
+             <property name="toolTip">
+              <string>How the molecules are fitted</string>
+             </property>
+             <item>
+              <property name="text">
+               <string>Overlapping groups together</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>One molecule at a time</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="2">
+            <widget class="QPushButton" name="fitButton">
+             <property name="text">
+              <string>Fit</string>
+             </property>
+             <property name="default">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1400</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionSaveAs"/>
+    <addaction name="separator"/>
+    <addaction name="actionSettings"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuMolecules">
+    <property name="title">
+     <string>&amp;Molecules</string>
+    </property>
+    <addaction name="actionLoadMolecules"/>
+    <addaction name="actionLoadMoleculeFolder"/>
+    <addaction name="separator"/>
+    <addaction name="actionClusterGenerator"/>
+   </widget>
+   <widget class="QMenu" name="menuCalibration">
+    <property name="title">
+     <string>&amp;Calibration</string>
+    </property>
+    <addaction name="actionBackground"/>
+    <addaction name="actionCalibration"/>
+    <addaction name="actionPeakShape"/>
+    <addaction name="actionDriftCorrection"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoadCalibration"/>
+   </widget>
+   <widget class="QMenu" name="menuData">
+    <property name="title">
+     <string>&amp;Data</string>
+    </property>
+    <addaction name="actionExportSeries"/>
+    <addaction name="actionExportSpectrum"/>
+    <addaction name="actionExportFitted"/>
+    <addaction name="separator"/>
+    <addaction name="actionGlobalFit"/>
+    <addaction name="actionBatchFit"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="actionOverview"/>
+    <addaction name="actionLogScale"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuMolecules"/>
+   <addaction name="menuCalibration"/>
+   <addaction name="menuData"/>
+   <addaction name="menuView"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpen">
+   <property name="text">
+    <string>&amp;Open…</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>&amp;Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionSaveAs">
+   <property name="text">
+    <string>Save &amp;as…</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings…</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>&amp;Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionLoadMolecules">
+   <property name="text">
+    <string>Load from IsotopeFit file (.ifm, .ifd)…</string>
+   </property>
+  </action>
+  <action name="actionLoadMoleculeFolder">
+   <property name="text">
+    <string>Load from folder of text files…</string>
+   </property>
+  </action>
+  <action name="actionClusterGenerator">
+   <property name="text">
+    <string>Cluster generator…</string>
+   </property>
+  </action>
+  <action name="actionBackground">
+   <property name="text">
+    <string>Background correction…</string>
+   </property>
+  </action>
+  <action name="actionCalibration">
+   <property name="text">
+    <string>Mass and resolution calibration…</string>
+   </property>
+  </action>
+  <action name="actionPeakShape">
+   <property name="text">
+    <string>Edit peak shape (current view)…</string>
+   </property>
+  </action>
+  <action name="actionDriftCorrection">
+   <property name="text">
+    <string>Drift correction…</string>
+   </property>
+   <property name="toolTip">
+    <string>Correct a drift of the flight times during the measurement, using the spectra in the .h5 file</string>
+   </property>
+  </action>
+  <action name="actionLoadCalibration">
+   <property name="text">
+    <string>Load calibration and molecules from .ifd…</string>
+   </property>
+  </action>
+  <action name="actionExportSeries">
+   <property name="text">
+    <string>Export cluster series…</string>
+   </property>
+  </action>
+  <action name="actionExportSpectrum">
+   <property name="text">
+    <string>Export calibrated mass spectrum…</string>
+   </property>
+  </action>
+  <action name="actionExportFitted">
+   <property name="text">
+    <string>Export fitted mass spectrum…</string>
+   </property>
+  </action>
+  <action name="actionGlobalFit">
+   <property name="text">
+    <string>Fit all molecules at once (global)</string>
+   </property>
+   <property name="toolTip">
+    <string>One non-negative least-squares fit of every molecule over the whole spectrum (MATLAB batch_fit)</string>
+   </property>
+  </action>
+  <action name="actionBatchFit">
+   <property name="text">
+    <string>Batch fit a folder of .ifd files…</string>
+   </property>
+   <property name="toolTip">
+    <string>Fit every .ifd file in a folder with the global fit and save the results</string>
+   </property>
+  </action>
+  <action name="actionOverview">
+   <property name="text">
+    <string>Overview</string>
+   </property>
+   <property name="toolTip">
+    <string>Show the whole spectrum</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
+   </property>
+  </action>
+  <action name="actionLogScale">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Log scale</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
