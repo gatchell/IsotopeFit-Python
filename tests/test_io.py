@@ -89,3 +89,61 @@ def test_load_clustof_h5():
     # The rebuilt and the stored mass axis should agree closely away from time zero.
     sel = p2.raw_peakdata[:, 0] > 10
     np.testing.assert_allclose(p.raw_peakdata[sel, 0], p2.raw_peakdata[sel, 0], rtol=1e-3)
+
+
+# ------------------------------------------------------------------ text spectra
+
+
+def _write(tmp_path, name, text):
+    p = tmp_path / name
+    p.write_text(text, encoding="utf-8")
+    return p
+
+
+def test_ascii_tab_separated_with_header(tmp_path):
+    from isotopefit.io import load_ascii
+
+    p = _write(tmp_path, "spec.txt", "Mass\tSignal\n(u)\t(counts)\n1.0\t10\n1.5\t20\n2.0\t30\n")
+    project = load_ascii(p)
+    np.testing.assert_allclose(project.raw_peakdata, [[1.0, 10], [1.5, 20], [2.0, 30]])
+    assert project.fileinfo["originalfilename"] == "spec" and project.peakdata is not None
+
+
+def test_ascii_tofdaq_export_uses_third_column(tmp_path):
+    from isotopefit.io import read_ascii_spectrum
+
+    header = "mass spectrum\n=============\n" + "".join(f"info line {i}\n" for i in range(11))
+    rows = "".join(f"{m}\t{i}\t{10 * m}\n" for i, m in enumerate((1.0, 2.0, 3.0)))
+    data = read_ascii_spectrum(_write(tmp_path, "tofdaq.txt", header + rows))
+    np.testing.assert_allclose(data, [[1.0, 10.0], [2.0, 20.0], [3.0, 30.0]])
+
+
+@pytest.mark.parametrize("text", [
+    "1.0 10\n2.0 20\n3.0 30\n",                      # no header, spaces
+    "# comment\n1.0,10\n2.0,20\n3.0,30\n",           # CSV
+    "mass;signal\n1,0;10\n2,0;20\n3,0;30\n",         # semicolons, decimal commas
+    "m\tI\n1,0\t10\n2,0\t20\n3,0\t30\n",             # tabs, decimal commas
+])
+def test_ascii_separators(tmp_path, text):
+    from isotopefit.io import read_ascii_spectrum
+
+    data = read_ascii_spectrum(_write(tmp_path, "s.dat", text))
+    np.testing.assert_allclose(data, [[1.0, 10], [2.0, 20], [3.0, 30]])
+
+
+def test_ascii_reads_back_the_spectrum_export(tmp_path):
+    from isotopefit.io import load_ascii
+    from isotopefit.view import export_spectrum
+
+    project = load_ifd(refdata("testfile.ifd"))
+    path = tmp_path / "export.txt"
+    export_spectrum(project, path, with_fit=True)  # mass, signal, fit
+    again = load_ascii(path)
+    np.testing.assert_allclose(again.raw_peakdata, project.peakdata, rtol=1e-6)
+
+
+def test_ascii_rejects_files_without_numbers(tmp_path):
+    from isotopefit.io import read_ascii_spectrum
+
+    with pytest.raises(ValueError):
+        read_ascii_spectrum(_write(tmp_path, "notes.txt", "just some\nwords here\n"))

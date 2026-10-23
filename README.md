@@ -37,7 +37,7 @@ and press Enter; select one or more series to plot them together, and click a po
 that molecule. Fit with the
 Fit box under the molecule list: choose which molecules (selected in the list, all, or those in
 the current view) and the method (overlapping groups together, or one molecule at a time); the
-button says what it will fit, and fits run in the background. Menus: open `.ifd`/`.h5`, save, load molecules, background correction, load a
+button says what it will fit, and fits run in the background. Menus: open `.ifd`/`.h5` or a text spectrum, save, load molecules, background correction, load a
 calibration, settings, and the exports.
 
 Above the spectrum: Whole spectrum, Zoom in/out, ◀ ▶ to step through the masses, Fit height (fit
@@ -123,13 +123,14 @@ pillow`, then `python -m PyInstaller packaging/IsotopeFit.spec`; the program is 
 ## Quick use
 
 ```python
-from isotopefit import load_ifd, load_h5, save_ifd
+from isotopefit import load_ascii, load_ifd, load_h5, save_ifd
 
 project = load_ifd("measurement.ifd")       # old MATLAB project files load directly
 project.peakdata                            # cropped, background-subtracted, mass-corrected
 project.molecules[0].name, project.calibration.resolution([100.0])
 
 raw = load_h5("DataFile.h5", instrument="clustof")   # or "surftof"
+raw = load_ascii("spectrum.txt")                     # text: mass and signal columns
 save_ifd(project, "copy.ifd")               # readable by the MATLAB version
 ```
 
@@ -219,6 +220,7 @@ src/isotopefit/
   gui/            PySide6 + pyqtgraph user interface; layouts in gui/ui/*.ui
   io/ifd.py       .ifd project files, load and save (load_ifd.m, save_file)
   io/molecules.py .ifm molecule files and folders of pattern text files
+  io/ascii.py     text spectra: columns of mass and signal, TOFDAQ text exports (load_ascii)
   io/h5.py        TOFWERK (CLUSTOF) and IoniTOF (SURFTOF) HDF5 spectra (load_h5, h5cal.m)
   data/           default Gaussian peak shape and the element isotope tables, copied from MATLAB
 packaging/        macOS app and Windows program: PyInstaller spec, Mac build script, icon
@@ -275,6 +277,7 @@ The tests set these explicitly.
 |---|---|---|
 | Data model, `.ifd` load/save | `load_ifd.m`, `IsotopeFit.m` | done |
 | HDF5 import | `IsotopeFit.m` (`load_h5`), `h5cal.m` | done, tested on `clustof.h5` |
+| Text (ASCII) import | `IsotopeFit.m` (`load_ascii`) | done; header lines and separators detected instead of MATLAB's fixed two header lines and tabs |
 | Calibration curves | `getcalibrationdata.m` and helpers | done, except `spaps` |
 | Background, mass offset | `subtractbg.m`, `subtractmassoffset.m` | done |
 | Background estimation | `bg_correction.m`, `find_bg.m` | done |

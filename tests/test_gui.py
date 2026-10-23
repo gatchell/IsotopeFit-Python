@@ -458,3 +458,16 @@ def test_series_axes_follow_points_not_error_bars(app):
     assert y1 >= s.areas.max() and x0 <= s.sizes.min() and x1 >= s.sizes.max()
     win.project.gui_status["changed"] = False
     win.w.close()
+
+
+def test_open_text_spectrum(app, tmp_path):
+    from isotopefit.gui.main_window import MainWindow
+
+    path = tmp_path / "spectrum.txt"
+    path.write_text("Mass\tSignal\n" + "".join(f"{m:.3f}\t{100 + m}\n" for m in np.arange(1, 50, 0.01)))
+    win = MainWindow()
+    win.open_path(str(path))
+    assert win.project is not None and win.project.raw_peakdata.shape == (4900, 2)
+    assert win.path is None  # a new project: Save asks for an .ifd name
+    win.project.gui_status["changed"] = False
+    win.w.close()

@@ -300,19 +300,26 @@ class MainWindow:
             return
         path, _ = QFileDialog.getOpenFileName(
             self.w, "Open", self._start_dir(),
-            "IsotopeFit or HDF5 files (*.ifd *.h5);;IsotopeFit data (*.ifd);;HDF5 spectra (*.h5)")
+            "All supported files (*.ifd *.h5 *.txt *.dat *.csv *.asc);;IsotopeFit data (*.ifd);;"
+            "HDF5 spectra (*.h5);;Text spectra (*.txt *.dat *.csv *.asc);;All files (*)")
         if path:
             self.open_path(path)
 
     def open_path(self, path: str) -> None:
+        """Open a project (.ifd), an HDF5 spectrum (.h5) or a text spectrum (anything else)."""
         try:
-            if path.lower().endswith(".h5"):
+            ext = os.path.splitext(path)[1].lower()
+            if ext == ".h5":
                 project = self._open_h5(path)
                 if project is None:
                     return
                 self.set_project(project, None)
-            else:
+            elif ext == ".ifd":
                 self.set_project(io.load_ifd(path), path)
+            else:  # as in MATLAB, any other file is read as a text spectrum
+                self.set_project(io.load_ascii(path), None)
+                self._status(f"Text spectrum with {self.project.raw_peakdata.shape[0]} points "
+                             "loaded. Next: background correction, molecules and calibration.")
         except Exception as exc:  # noqa: BLE001 - shown to the user
             error_box(self.w, "Open", f"Could not open {os.path.basename(path)}:\n{exc}")
 

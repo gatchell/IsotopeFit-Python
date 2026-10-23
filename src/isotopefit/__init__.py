@@ -9,7 +9,7 @@ from .batch import batch_fit, fit_global, fit_project_global
 from .background import correct_background, find_background
 from .calibrate import calibrate, calibrate_project, load_calibration
 from .fitting import fit_project, fit_with_calibration
-from .io import load_h5, load_ifd, load_ifm, load_molecule_folder, save_ifd, save_ifm
+from .io import load_ascii, load_h5, load_ifd, load_ifm, load_molecule_folder, save_ifd, save_ifm
 from .isotopes import generate_clusters, parse_molecule
 from .model import BackgroundCorrection, Calibration, Molecule, PeakShape, Project
 from .molecules import find_ranges, init_molecules
@@ -36,6 +36,7 @@ __all__ = [
     "fit_with_calibration",
     "generate_clusters",
     "init_molecules",
+    "load_ascii",
     "load_h5",
     "load_ifd",
     "load_calibration",
